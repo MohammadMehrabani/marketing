@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Contracts\UserAuthenticateServiceInterface;
+use App\Contracts\UserRepositoryInterface;
+use App\Repositories\MysqlUserRepository;
+use App\Services\UserAuthenticateService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Response;
 
@@ -12,7 +16,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Repositories
+        $this->app->singleton(UserRepositoryInterface::class, MysqlUserRepository::class);
+
+        // Services
+        $this->app->singleton(UserAuthenticateServiceInterface::class, UserAuthenticateService::class);
     }
 
     /**
