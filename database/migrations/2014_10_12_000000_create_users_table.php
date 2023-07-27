@@ -13,12 +13,20 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('firstname')->nullable();
+            $table->string('lastname')->nullable();
+
+            $table->enum('type', ['marketer', 'merchant'])->index()->nullable();
+            $table->string('name')->nullable()->unique()->comment('e.g. company, website, app, ...');
+            $table->string('url')->nullable()->unique()->comment('e.g. website, telegram, ...');
+
+            $table->string('mobile', 11)->unique();
+            $table->timestamp('mobile_verified_at')->nullable();
+            $table->string('password')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
