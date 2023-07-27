@@ -14,6 +14,7 @@ After that completes, execute the commands in the terminal in order:
 - `docker compose run --rm composer install`
 - `cp .env.example .env`
 - `docker compose run --rm artisan key:generate`
+- `docker compose run --rm artisan jwt:secret`
 
 **Note**: Your MySQL database host name should be `mysql`, **not** `localhost`. The username and database should both be `homestead` with a password of `secret`.
 
