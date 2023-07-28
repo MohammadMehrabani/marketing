@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Marketer\MarketingController;
 use App\Http\Controllers\Merchant\ProductController;
+use App\Http\Controllers\RedirectorController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('user.')->prefix('user')->group(function () {
@@ -34,3 +35,5 @@ Route::name('marketer.')->prefix('marketer')->middleware(['jwt.verify:marketer']
     Route::get('products/visitCount', [MarketingController::class, 'productVisitCounts'])->name('products.visitCount');
     Route::post('products/addForMarketing', [MarketingController::class, 'productAddForMarketing'])->name('products.addForMarketing');
 });
+
+Route::get('redirector', [RedirectorController::class, 'redirect'])->name('redirector');

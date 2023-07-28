@@ -6,6 +6,7 @@ use App\Contracts\MarketerProductRepositoryInterface;
 use App\Contracts\MarketerProductServiceInterface;
 use App\Contracts\ProductRepositoryInterface;
 use App\Contracts\ProductServiceInterface;
+use App\Contracts\RedirectorServiceInterface;
 use App\Contracts\UserAuthenticateServiceInterface;
 use App\Contracts\UserRepositoryInterface;
 use App\Repositories\MysqlMarketerProductRepository;
@@ -13,6 +14,7 @@ use App\Repositories\MysqlProductRepository;
 use App\Repositories\MysqlUserRepository;
 use App\Services\MarketerProductService;
 use App\Services\ProductService;
+use App\Services\RedirectorService;
 use App\Services\UserAuthenticateService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Response;
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UserAuthenticateServiceInterface::class, UserAuthenticateService::class);
         $this->app->singleton(ProductServiceInterface::class, ProductService::class);
         $this->app->singleton(MarketerProductServiceInterface::class, MarketerProductService::class);
+        $this->app->singleton(RedirectorServiceInterface::class, RedirectorService::class);
     }
 
     /**
