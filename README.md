@@ -14,6 +14,16 @@ Next, navigate in your terminal to the directory you cloned this, and spin up th
 
 **Note**: Your Redis database host name should be `redis`, **not** `localhost`.
 
+```dotenv
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=homestead
+DB_USERNAME=homestead
+DB_PASSWORD=secret
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
 After that completes, execute the commands in the terminal in order:
 - `docker compose run --rm composer install`
 - `cp .env.example .env`
