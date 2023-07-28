@@ -39,6 +39,6 @@ class MysqlUserRepository implements UserRepositoryInterface
 
     public function findByMobile(UserDto $arguments)
     {
-        return User::query()->where('mobile', $arguments->mobile)->first();
+        return User::query()->where('mobile', $arguments->mobile)->firstOrFail();
     }
 }

@@ -42,7 +42,10 @@ class Handler extends ExceptionHandler
         } else if($e instanceof ValidationException) {
             return $this->invalidJson($request, $e);
         } else if($e instanceof ModelNotFoundException) {
-            return response()->error('No query results for: '.implode(',',$e->getIds()), 404);
+            $showId = '';
+            if (!empty($e->getIds()))
+                $showId = ' for: '.implode(',',$e->getIds());
+            return response()->error('No query results'.$showId, 404);
         }
 
         return parent::render($request, $e);
