@@ -26,4 +26,9 @@ class MysqlMarketerProductRepository implements MarketerProductRepositoryInterfa
             'creation_date' => date('Y-m-d'),
         ]);
     }
+
+    public function findByProduct($productId)
+    {
+        return MarketerProduct::query()->where('product_id', $productId)->first();
+    }
 }

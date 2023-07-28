@@ -39,9 +39,9 @@ class MysqlProductRepository implements ProductRepositoryInterface
         return $product;
     }
 
-    public function delete(Product $product)
+    public function delete($product)
     {
-        return $product->delete();
+        return Product::findOrFail($product)->delete();
     }
 
     public function find($id)

@@ -12,7 +12,7 @@ interface ProductServiceInterface
 
     public function update(Product $product, array $arguments);
 
-    public function delete(Product $product);
+    public function delete($product);
 
-    public function show(Product $product);
+    public function show($product);
 }

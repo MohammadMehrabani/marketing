@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\MarketerProductRepositoryInterface;
 use App\Contracts\ProductRepositoryInterface;
 use App\Contracts\ProductServiceInterface;
 use App\DTO\ProductDto;
@@ -13,7 +14,8 @@ use Illuminate\Support\Facades\File;
 class ProductService implements ProductServiceInterface
 {
     public function __construct(
-        private ProductRepositoryInterface $productRepository
+        private ProductRepositoryInterface $productRepository,
+        private MarketerProductRepositoryInterface $marketerProductRepository,
     )
     {
     }
@@ -56,15 +58,18 @@ class ProductService implements ProductServiceInterface
         return $product;
     }
 
-    public function delete(Product $product)
+    public function delete($product)
     {
-        try {
-            // We don't delete the image, because softDeletes is enabled
-            // TODO: if exists product into marketer list can't delete
-            return $this->productRepository->delete($product);
-        } catch (\Exception $e) {
-            throw new ApiException(trans('messages.errors.404'), 404);
-        }
+        // Note: We don't delete the image, because softDeletes is enabled
+
+        // if exists product into marketer list can't delete
+        $existsProduct = $this->marketerProductRepository->findByProduct($product);
+
+        if ($existsProduct)
+            throw new ApiException('exists product into marketer list', 400);
+
+        return $this->productRepository->delete($product);
+
     }
 
     public function show($product)
