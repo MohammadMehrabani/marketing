@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Merchant\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('user.')->prefix('user')->group(function () {
@@ -20,4 +21,9 @@ Route::name('user.')->prefix('user')->group(function () {
 
     });
 
+});
+
+Route::name('merchant.')->prefix('merchant')->middleware(['jwt.verify:merchant'])->group(function () {
+    Route::apiResource('products', ProductController::class)->except('update');
+    Route::post('products/{product}', [ProductController::class, 'update'])->name('products.update');
 });
