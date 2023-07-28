@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('marketer_id');
             $table->foreign('marketer_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('product_id')->index();
             $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
             $table->unsignedInteger('view_count')->default(0);
             $table->date('creation_date')->index();
