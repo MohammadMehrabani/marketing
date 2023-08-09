@@ -2,17 +2,33 @@
 
 namespace App\DTO;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\ValidatedInput;
+
 class ProductDto
 {
     public function __construct(
-        public $title,
-        public $description,
-        public $image, // $request->file()
-        public $imageName,
-        public $url,
-        public $viewCount,
-        public $merchantId
-    ) {
+        public readonly ?string $title,
+        public readonly ?string $description,
+        public readonly ?UploadedFile $image, // $request->file()
+        public readonly ?string $imageName,
+        public readonly ?string $url,
+        public readonly ?int $viewCount,
+        public readonly ?int $merchantId
+    ) {}
+
+    public static function fromRequest(Request|ValidatedInput $request)
+    {
+        return new self(
+            $request->title ?? null,
+            $request->description ?? null,
+            $request->image ?? null,
+            $request->imageName ?? null,
+            $request->url ?? null,
+            $request->viewCount ?? null,
+            $request->merchantId ?? null
+        );
     }
 
     public static function fromArray(array $array)

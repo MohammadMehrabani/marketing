@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Merchant;
 
 use App\Contracts\ProductServiceInterface;
+use App\DTO\ProductDto;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\IndexRequest;
+use App\Http\Requests\Product\StoreRequest;
+use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
 use App\Traits\SharedBetweenControllers;
-use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -14,24 +17,19 @@ class ProductController extends Controller
 
     public function __construct(
         private ProductServiceInterface $productService
-    )
-    {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
-        $request->validate($inputs = [
-            'title' => 'nullable'
-        ]);
+        $validatedRequest = $request->safe()->merge(['merchantId' => auth()->id()]);
 
-        $inputs['merchantId'] = auth()->id();
-        $request->merge(['merchantId' => auth()->id()]);
+        $dto = ProductDto::fromRequest($validatedRequest);
 
         $data = $this->productService->getAllProductsWithPaginate(
-            $this->getParams(array_keys($inputs)), $this->perPage(), $this->orderBy()
+            $dto, $this->perPage(), $this->orderBy()
         );
 
         return response()->success($data);
@@ -40,16 +38,14 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $request->validate($inputs = [
-            'title' => 'required',
-            'description' => 'required',
-            'image' => 'required|mimes:jpg,jpeg,png',
-            'url' => 'required|url',
-        ]);
+        $imageName = !empty($request->image) ? time().'_'.$request->image->getClientOriginalName() : null;
+        $validatedRequest = $request->safe()->merge(['imageName' => $imageName, 'merchantId' => auth()->id()]);
 
-        $data = $this->productService->store($this->getParams(array_keys($inputs)));
+        $dto = ProductDto::fromRequest($validatedRequest);
+
+        $data = $this->productService->store($dto);
 
         if ($data)
             return response()->success($data);
@@ -60,24 +56,22 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($product)
+    public function show(Product $product)
     {
-        return response()->success($this->productService->show($product));
+        return response()->success($this->productService->show($product, auth()->id()));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Product $product, Request $request)
+    public function update(Product $product, UpdateRequest $request)
     {
-        $request->validate($inputs = [
-            'title' => 'required',
-            'description' => 'required',
-            'image' => 'nullable|mimes:jpg,jpeg,png',
-            'url' => 'required|url',
-        ]);
+        $imageName = !empty($request->image) ? time().'_'.$request->image->getClientOriginalName() : $product->getRawOriginal('image');
+        $validatedRequest = $request->safe()->merge(['imageName' => $imageName, 'merchantId' => auth()->id()]);
 
-        $data = $this->productService->update($product, $this->getParams(array_keys($inputs)));
+        $dto = ProductDto::fromRequest($validatedRequest);
+
+        $data = $this->productService->update($product, $dto);
 
         if ($data)
             return response()->success($data);
@@ -88,9 +82,9 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($product)
+    public function destroy(Product $product)
     {
-        $data = $this->productService->delete($product);
+        $data = $this->productService->delete($product, auth()->id());
 
         if ($data)
             return response()->success('deleted successfully');

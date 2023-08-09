@@ -13,7 +13,5 @@ interface ProductRepositoryInterface
 
     public function update(Product $product, ProductDto $arguments);
 
-    public function delete($product);
-
-    public function find($id);
+    public function delete(Product $product);
 }

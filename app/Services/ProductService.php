@@ -20,47 +20,42 @@ class ProductService implements ProductServiceInterface
     {
     }
 
-    public function getAllProductsWithPaginate(array $arguments, $perPage = 15, $orderBy = '')
+    public function getAllProductsWithPaginate(ProductDto $productDto, $perPage = 15, $orderBy = '')
     {
-        $arguments = ProductDto::fromArray($arguments);
-
-        return new ProductCollection($this->productRepository->getAllProductsWithPaginate($arguments, $perPage, $orderBy));
+        return new ProductCollection($this->productRepository->getAllProductsWithPaginate($productDto, $perPage, $orderBy));
     }
 
-    public function store(array $arguments)
+    public function store(ProductDto $productDto)
     {
-        $imageName = !empty($arguments['image']) ? time().'_'.$arguments['image']->getClientOriginalName() : null;
-        $arguments['imageName'] = $imageName;
-        $arguments['merchantId'] = auth()->id();
-        $arguments = ProductDto::fromArray($arguments);
+        $product = $this->productRepository->create($productDto);
 
-        $product = $this->productRepository->create($arguments);
-
-        if ($product->id && $imageName)
-            $arguments->image->move(public_path('uploads/product/'.$product->id), $imageName);
+        if ($product->id && $productDto->image && $productDto->imageName)
+            $productDto->image->move(public_path('uploads/product/'.$product->id), $productDto->imageName);
 
         return $product;
     }
 
-    public function update(Product $product, array $arguments)
+    public function update(Product $product, ProductDto $productDto)
     {
-        $imageName = !empty($arguments['image']) ? time().'_'.$arguments['image']->getClientOriginalName() : $product->getRawOriginal('image');
-        $arguments['imageName'] = $imageName;
-        $arguments = ProductDto::fromArray($arguments);
+        if ($product->merchant_id !== $productDto->merchantId)
+            throw new ApiException('access denied',403);
 
-        $product = $this->productRepository->update($product, $arguments);
+        $product = $this->productRepository->update($product, $productDto);
 
-        if ($product->id && $arguments->image) {
+        if ($product->id && $productDto->image && $productDto->imageName) {
             File::deleteDirectory(public_path('uploads/product/'.$product->id));
-            $arguments->image->move(public_path('uploads/product/'.$product->id), $imageName);
+            $productDto->image->move(public_path('uploads/product/'.$product->id), $productDto->imageName);
         }
 
         return $product;
     }
 
-    public function delete($product)
+    public function delete(Product $product, $userId)
     {
         // Note: We don't delete the image, because softDeletes is enabled
+
+        if ($product->merchant_id !== $userId)
+            throw new ApiException('access denied',403);
 
         // if exists product into marketer list can't delete
         $existsProduct = $this->marketerProductRepository->findByProduct($product);
@@ -69,14 +64,11 @@ class ProductService implements ProductServiceInterface
             throw new ApiException('exists product into marketer list', 400);
 
         return $this->productRepository->delete($product);
-
     }
 
-    public function show($product)
+    public function show(Product $product, $userId)
     {
-        $product = $this->productRepository->find($product);
-
-        if ($product->merchant_id !== auth()->id())
+        if ($product->merchant_id !== $userId)
             throw new ApiException('access denied',403);
 
         return $product;

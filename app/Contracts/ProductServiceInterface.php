@@ -2,17 +2,18 @@
 
 namespace App\Contracts;
 
+use App\DTO\ProductDto;
 use App\Models\Product;
 
 interface ProductServiceInterface
 {
-    public function getAllProductsWithPaginate(array $arguments, $perPage = 15, $orderBy = '');
+    public function getAllProductsWithPaginate(ProductDto $productDto, $perPage = 15, $orderBy = '');
 
-    public function store(array $arguments);
+    public function store(ProductDto $productDto);
 
-    public function update(Product $product, array $arguments);
+    public function update(Product $product, ProductDto $productDto);
 
-    public function delete($product);
+    public function delete(Product $product, $userId);
 
-    public function show($product);
+    public function show(Product $product, $userId);
 }

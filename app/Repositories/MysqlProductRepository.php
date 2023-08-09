@@ -6,8 +6,13 @@ use App\Contracts\ProductRepositoryInterface;
 use App\DTO\ProductDto;
 use App\Models\Product;
 
-class MysqlProductRepository implements ProductRepositoryInterface
+class MysqlProductRepository extends MysqlBaseRepository implements ProductRepositoryInterface
 {
+    public function model()
+    {
+        return Product::class;
+    }
+
     public function getAllProductsWithPaginate(ProductDto $arguments, $perPage = 15, $orderBy = '')
     {
         $query = Product::query()->filter($arguments)->customOrderBy($orderBy);
@@ -39,13 +44,8 @@ class MysqlProductRepository implements ProductRepositoryInterface
         return $product;
     }
 
-    public function delete($product)
+    public function delete(Product $product)
     {
-        return Product::findOrFail($product)->delete();
-    }
-
-    public function find($id)
-    {
-        return Product::query()->findOrFail($id);
+        return $product->delete();
     }
 }
