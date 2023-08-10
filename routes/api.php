@@ -32,8 +32,8 @@ Route::name('merchant.')->prefix('merchant')->middleware(['jwt.verify:merchant']
 
 Route::name('marketer.')->prefix('marketer')->middleware(['jwt.verify:marketer'])->group(function () {
     Route::get('products', [MarketingController::class, 'index'])->name('products.index');
-    Route::get('products/visitCount', [MarketingController::class, 'productVisitCounts'])->name('products.visitCount');
-    Route::post('products/addForMarketing', [MarketingController::class, 'productAddForMarketing'])->name('products.addForMarketing');
+    Route::get('products/me', [MarketingController::class, 'marketerProducts'])->name('products.me');
+    Route::post('products', [MarketingController::class, 'addProductForMarketer'])->name('addProducts');
 });
 
 Route::get('redirector', [RedirectorController::class, 'redirect'])->name('redirector');

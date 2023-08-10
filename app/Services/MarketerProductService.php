@@ -13,28 +13,28 @@ class MarketerProductService implements MarketerProductServiceInterface
     public function __construct(
         private MarketerProductRepositoryInterface $marketerProductRepository,
         private ProductRepositoryInterface $productRepository,
-    )
+    ) {}
+
+    public function getAllProductsWithPaginate(MarketerProductDto $marketerProductDto, $perPage = 15, $orderBy = '')
     {
+        return new ProductCollection(
+            $this->marketerProductRepository->getAllProductsWithPaginate(
+                $marketerProductDto, $perPage, $orderBy
+            )
+        );
     }
 
-    public function getAllProductsWithPaginate(array $arguments, $perPage = 15, $orderBy = '')
+    public function create(MarketerProductDto $marketerProductDto)
     {
-        $arguments = MarketerProductDto::fromArray($arguments);
+        // if the product is not exists, an exception is thrown
+        $this->productRepository->findOrFail($marketerProductDto->productId);
 
-        return new ProductCollection($this->marketerProductRepository->getAllProductsWithPaginate($arguments, $perPage, $orderBy));
-    }
-
-    public function create(array $arguments)
-    {
-        $arguments = MarketerProductDto::fromArray($arguments);
-
-        $this->productRepository->find($arguments->productId);
-
-        $this->marketerProductRepository->create($arguments);
+        $this->marketerProductRepository->create($marketerProductDto);
 
         return [
-            'shareLink' => request()->getSchemeAndHttpHost().'/api/redirector?product='.
-                            $arguments->productId.'&marketer='.$arguments->marketerId
+            'shareLink' => request()->getSchemeAndHttpHost().'/api/redirector'.
+                            '?productId='.$marketerProductDto->productId.
+                            '&marketerId='.$marketerProductDto->marketerId
         ];
     }
 }
