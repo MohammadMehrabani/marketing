@@ -6,8 +6,13 @@ use App\Contracts\UserRepositoryInterface;
 use App\DTO\UserDto;
 use App\Models\User;
 
-class MysqlUserRepository implements UserRepositoryInterface
+class MysqlUserRepository extends MysqlBaseRepository implements UserRepositoryInterface
 {
+    public function model()
+    {
+        return User::class;
+    }
+
     public function create(UserDto $arguments)
     {
         return User::create([
@@ -23,7 +28,6 @@ class MysqlUserRepository implements UserRepositoryInterface
 
     public function update(User $user, UserDto $arguments)
     {
-        $user = User::query()->findOrFail($user->id);
         $user->update([
             'firstname' => $arguments->firstName ?: $user->firstname,
             'lastname' => $arguments->lastName ?: $user->lastname,
@@ -37,8 +41,8 @@ class MysqlUserRepository implements UserRepositoryInterface
         return $user;
     }
 
-    public function findByMobile(UserDto $arguments)
+    public function findByMobile($mobile)
     {
-        return User::query()->where('mobile', $arguments->mobile)->firstOrFail();
+        return User::query()->where('mobile', $mobile)->first();
     }
 }

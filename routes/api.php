@@ -13,8 +13,8 @@ Route::name('user.')->prefix('user')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register'])->name('register');
     Route::post('refresh', [AuthController::class, 'refresh'])->name('refreshToken');
-    Route::post('password/reset', [AuthController::class, 'changePassword'])->name('changePassword');
     Route::post('password/reset/token', [AuthController::class, 'getTokenPasswordReset'])->name('getTokenPasswordReset');
+    Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('resetPassword');
 
     Route::group(['middleware' => ['jwt.verify:marketer|merchant']], function () {
 

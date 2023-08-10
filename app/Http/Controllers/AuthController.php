@@ -3,92 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\UserAuthenticateServiceInterface;
-use App\Rules\Mobile;
-use Illuminate\Http\Request;
+use App\DTO\UserDto;
+use App\Http\Requests\User\AuthenticateRequest;
+use App\Http\Requests\User\GetTokenPasswordResetRequest;
+use App\Http\Requests\User\LoginRequest;
+use App\Http\Requests\User\RegisterRequest;
+use App\Http\Requests\User\ResetPasswordRequest;
+use App\Http\Requests\User\SendOtpRequest;
+use App\Http\Requests\User\VaerifyOtpRequest;
 use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
-    public function __construct(private UserAuthenticateServiceInterface $userAuthenticateService)
-    {
-    }
+    public function __construct(
+        private UserAuthenticateServiceInterface $userAuthenticateService
+    ) {}
 
-    public function authenticate(Request $request)
+    public function authenticate(AuthenticateRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()]
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->authenticate(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->authenticate($dto);
 
         return response()->success($data);
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOtp(VaerifyOtpRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()],
-            'code' => ['required', 'digits:5'],
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->verifyOtp(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->verifyOtp($dto);
 
         return response()->success($data);
     }
 
-    public function sendOtp(Request $request)
+    public function sendOtp(SendOtpRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()]
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->sendOtp(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->sendOtp($dto);
 
-        $code = env('APP_ENV') == 'local' && Cache::has('otp_'.$request->mobile)
-            ? ' otp: '.Cache::get('otp_'.$request->mobile)
-            : '';
+        $code = env('APP_ENV') == 'local' && Cache::has('otp_'.$dto->mobile)
+                ? ' otp: '.Cache::get('otp_'.$dto->mobile)
+                : '';
 
-        if ($data)
+        if ($data && $code)
             return response()->success('otp sent successfully.'.$code);
-        else
-            return response()->error('your previous otp has not yet expired.');
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()],
-            'password' => ['required', 'string', 'confirmed', 'min:6'],
-            'firstname' => ['required', 'string'],
-            'lastname' => ['required', 'string'],
-            'type' => ['required', 'in:merchant,marketer'],
-            'name' => ['required', 'string'],
-            'url' => ['required', 'url']
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->register(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->register($dto);
 
         return response()->success($data);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()],
-            'password' => ['required', 'string', 'min:6'],
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->login(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->login($dto);
 
         return response()->success($data);
     }
@@ -114,37 +90,22 @@ class AuthController extends Controller
         return response()->success($data);
     }
 
-    public function changePassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()],
-            'password' => ['required', 'string', 'confirmed', 'min:6'],
-            'token' => ['required']
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->changePassword(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->resetPassword($dto);
 
         if ($data)
             return response()->success($data);
     }
 
-    public function getTokenPasswordReset(Request $request)
+    public function getTokenPasswordReset(GetTokenPasswordResetRequest $request)
     {
-        $request->validate($inputs = [
-            'mobile' => ['required', 'digits:11', new Mobile()]
-        ]);
+        $dto = UserDto::fromRequest($request->safe());
 
-        $data = $this->userAuthenticateService->getTokenPasswordReset(
-            $this->getParams(array_keys($inputs))
-        );
+        $data = $this->userAuthenticateService->getTokenPasswordReset($dto);
 
         return response()->success($data);
-    }
-
-    private function getParams($inputs = []): array
-    {
-        return request()->only($inputs);
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Contracts;
 
+use App\DTO\UserDto;
+
 interface UserAuthenticateServiceInterface
 {
-    public function authenticate(array $arguments);
-    public function sendOtp(array $arguments);
-    public function verifyOtp(array $arguments);
-    public function register(array $arguments);
-    public function login(array $arguments);
+    public function authenticate(UserDto $userDto);
+    public function sendOtp(UserDto $userDto);
+    public function verifyOtp(UserDto $userDto);
+    public function register(UserDto $userDto);
+    public function login(UserDto $userDto);
     public function refresh();
-    public function changePassword(array $arguments);
-    public function getTokenPasswordReset(array $arguments);
+    public function resetPassword(UserDto $userDto);
+    public function getTokenPasswordReset(UserDto $userDto);
 }
