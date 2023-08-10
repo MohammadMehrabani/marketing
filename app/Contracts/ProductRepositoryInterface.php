@@ -14,4 +14,6 @@ interface ProductRepositoryInterface
     public function update(Product $product, ProductDto $arguments);
 
     public function delete(Product $product);
+
+    public function incrementViewCount(ProductDto $productDto);
 }

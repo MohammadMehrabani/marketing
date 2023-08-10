@@ -2,7 +2,9 @@
 
 namespace App\Contracts;
 
+use App\DTO\MarketerProductDto;
+
 interface RedirectorServiceInterface
 {
-    public function redirect(array $arguments);
+    public function redirect(MarketerProductDto $marketerProductDto);
 }

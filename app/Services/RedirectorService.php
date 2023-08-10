@@ -2,30 +2,34 @@
 
 namespace App\Services;
 
+use App\Contracts\MarketerProductRepositoryInterface;
+use App\Contracts\ProductRepositoryInterface;
 use App\Contracts\RedirectorServiceInterface;
-use App\DTO\RedirectorDto;
+use App\DTO\MarketerProductDto;
+use App\DTO\ProductDto;
 use App\Exceptions\ApiException;
-use App\Models\MarketerProduct;
-use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RedirectorService implements RedirectorServiceInterface
 {
-    public function redirect(array $arguments)
-    {
-        $arguments = RedirectorDto::fromArray($arguments);
+    public function __construct(
+        private MarketerProductRepositoryInterface $marketerProductRepository,
+        private ProductRepositoryInterface $productRepository,
+    ) {}
 
+    public function redirect(MarketerProductDto $marketerProductDto)
+    {
         try {
             DB::beginTransaction();
-            $increamentViewCount = MarketerProduct::query()
-                ->where('marketer_id', $arguments->marketerId)
-                ->where('product_id', $arguments->productId)
-                ->update(['view_count' => DB::raw('view_count + 1')]);
+            $increamentViewCount = $this->marketerProductRepository->incrementViewCount($marketerProductDto);
 
             if ($increamentViewCount) {
-                $product = Product::query()->find($arguments->productId);
-                $product->update(['view_count' => DB::raw('view_count + 1')]);
+
+                $product = $this->productRepository->incrementViewCount(
+                    ProductDto::fromArray(['id' => $marketerProductDto->productId])
+                );
+
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -34,8 +38,8 @@ class RedirectorService implements RedirectorServiceInterface
         }
 
         if (empty($product))
-            throw new ApiException('invalid product or marketer', 404);
+            throw new ApiException('invalid productId or marketerId', 400);
 
-        return ['redirectUrl' => $product->url];
+        return ['redirectToUrl' => $product->url];
     }
 }

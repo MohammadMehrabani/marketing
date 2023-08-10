@@ -9,6 +9,7 @@ use Illuminate\Support\ValidatedInput;
 class ProductDto
 {
     public function __construct(
+        public readonly ?int $id,
         public readonly ?string $title,
         public readonly ?string $description,
         public readonly ?UploadedFile $image, // $request->file()
@@ -21,6 +22,7 @@ class ProductDto
     public static function fromRequest(Request|ValidatedInput $request)
     {
         return new self(
+            $request->id ?? null,
             $request->title ?? null,
             $request->description ?? null,
             $request->image ?? null,
@@ -34,6 +36,7 @@ class ProductDto
     public static function fromArray(array $array)
     {
         return new self(
+            $array['id'] ?? null,
             $array['title'] ?? null,
             $array['description'] ?? null,
             $array['image'] ?? null,

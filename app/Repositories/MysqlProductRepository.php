@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Contracts\ProductRepositoryInterface;
 use App\DTO\ProductDto;
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 
 class MysqlProductRepository extends MysqlBaseRepository implements ProductRepositoryInterface
 {
@@ -47,5 +48,12 @@ class MysqlProductRepository extends MysqlBaseRepository implements ProductRepos
     public function delete(Product $product)
     {
         return $product->delete();
+    }
+
+    public function incrementViewCount(ProductDto $productDto)
+    {
+        $product = Product::query()->find($productDto->id);
+        $product->update(['view_count' => DB::raw('view_count + 1')]);
+        return $product;
     }
 }

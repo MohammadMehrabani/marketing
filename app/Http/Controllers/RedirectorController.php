@@ -3,24 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\RedirectorServiceInterface;
+use App\DTO\MarketerProductDto;
+use App\Http\Requests\RedirectRequest;
 use App\Traits\SharedBetweenControllers;
-use Illuminate\Http\Request;
 
 class RedirectorController extends Controller
 {
     use SharedBetweenControllers;
 
-    public function __construct(private RedirectorServiceInterface $redirectorService)
-    {
-    }
+    public function __construct(
+        private RedirectorServiceInterface $redirectorService
+    ) {}
 
-    public function redirect(Request $request)
+    public function redirect(RedirectRequest $request)
     {
-        $request->validate($inputs = [
-            'product' => 'required',
-            'marketer' => 'required'
-        ]);
+        $dto = MarketerProductDto::fromRequest($request->safe());
 
-        return response()->success($this->redirectorService->redirect($this->getParams(array_keys($inputs))));
+        return response()->success($this->redirectorService->redirect($dto));
     }
 }
