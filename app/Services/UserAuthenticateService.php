@@ -39,13 +39,12 @@ class UserAuthenticateService implements UserAuthenticateServiceInterface
         }
 
         $newUser = $this->userRepository->create($userDto);
-        if ($newUser) {
-            return [
-                'mobile' => $newUser->mobile,
-                'newUser' => true,
-                'nextPage' => 'verifyOtp'
-            ];
-        }
+
+        return [
+            'mobile' => $newUser->mobile,
+            'newUser' => true,
+            'nextPage' => 'verifyOtp'
+        ];
     }
 
     public function sendOtp(UserDto $userDto)
@@ -96,8 +95,9 @@ class UserAuthenticateService implements UserAuthenticateServiceInterface
                     $this->passwordResetTokenRepository->create($userDto->mobile);
                 }
 
-                // call internal(private) endpoint password/reset/token for get reset password token($resetToken) in resetPassword page
-                // and set input hidden with name=token and value=$resetToken
+                // Note:
+                // call internal(private) endpoint password/reset/token for get reset password token($resetToken)
+                // and set input hidden with name=token and value=$resetToken in resetPassword page
                 return [
                     'mobile' => $userDto->mobile,
                     'newUser' => false,

@@ -40,8 +40,8 @@ class Product extends Model
     {
         return Attribute::make(
             get: fn(?string $value) => !empty($value)
-                ? asset('uploads/product/'.$this->id.'/'.$value)
-                : null,
+                                        ? asset('uploads/product/'.$this->id.'/'.$value)
+                                        : null,
         );
     }
 }

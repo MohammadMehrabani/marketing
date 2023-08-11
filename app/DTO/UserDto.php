@@ -18,8 +18,7 @@ class UserDto
         public readonly ?string $otp,
         public readonly ?string $resetPasswordToken,
         public readonly ?string $mobileVerifiedAt,
-    ) {
-    }
+    ) {}
 
     public static function fromRequest(Request|ValidatedInput $request)
     {

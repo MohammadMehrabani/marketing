@@ -49,6 +49,8 @@ class AuthController extends Controller
 
         if ($data && $code)
             return response()->success('otp sent successfully.'.$code);
+
+        return response()->error('send otp failed');
     }
 
     public function register(RegisterRequest $request)
@@ -98,6 +100,8 @@ class AuthController extends Controller
 
         if ($data)
             return response()->success($data);
+
+        return response()->error('password reset failed');
     }
 
     public function getTokenPasswordReset(GetTokenPasswordResetRequest $request)

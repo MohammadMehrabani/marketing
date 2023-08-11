@@ -16,9 +16,7 @@ class ProductService implements ProductServiceInterface
     public function __construct(
         private ProductRepositoryInterface $productRepository,
         private MarketerProductRepositoryInterface $marketerProductRepository,
-    )
-    {
-    }
+    ) {}
 
     public function getAllProductsWithPaginate(ProductDto $productDto, $perPage = 15, $orderBy = '')
     {

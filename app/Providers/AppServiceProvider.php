@@ -28,17 +28,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Repositories
-        $this->app->singleton(UserRepositoryInterface::class, MysqlUserRepository::class);
-        $this->app->singleton(ProductRepositoryInterface::class, MysqlProductRepository::class);
-        $this->app->singleton(MarketerProductRepositoryInterface::class, MysqlMarketerProductRepository::class);
-        $this->app->singleton(PasswordResetTokenRepositoryInterface::class, MysqlPasswordResetTokenRepository::class);
+        $singletons = [
+            // Repositories
+            UserRepositoryInterface::class               => MysqlUserRepository::class,
+            ProductRepositoryInterface::class            => MysqlProductRepository::class,
+            MarketerProductRepositoryInterface::class    => MysqlMarketerProductRepository::class,
+            PasswordResetTokenRepositoryInterface::class => MysqlPasswordResetTokenRepository::class,
+            // Services
+            UserAuthenticateServiceInterface::class      => UserAuthenticateService::class,
+            ProductServiceInterface::class               => ProductService::class,
+            MarketerProductServiceInterface::class       => MarketerProductService::class,
+            RedirectorServiceInterface::class            => RedirectorService::class,
+        ];
 
-        // Services
-        $this->app->singleton(UserAuthenticateServiceInterface::class, UserAuthenticateService::class);
-        $this->app->singleton(ProductServiceInterface::class, ProductService::class);
-        $this->app->singleton(MarketerProductServiceInterface::class, MarketerProductService::class);
-        $this->app->singleton(RedirectorServiceInterface::class, RedirectorService::class);
+        foreach ($singletons as $abstract => $concrete) {
+            $this->app->singleton($abstract, $concrete);
+        }
     }
 
     /**
